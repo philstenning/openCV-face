@@ -1,0 +1,8 @@
+version: '2.1'
+
+services:
+    opencv-face:
+        image: opencv-face
+        build: .
+        ports:
+            - 5004:5004

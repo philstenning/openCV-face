@@ -1,0 +1,22 @@
+{
+    "name": "opencv-workings",
+    "version": "1.0.0",
+    "description": "just some bits",
+    "main": "server.py",
+    "scripts": {
+        "test": "none"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/robot-websockets/opencv-workings.git"
+    },
+    "keywords": [
+        "opencv"
+    ],
+    "author": "Phil Stenning",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/robot-websockets/opencv-workings/issues"
+    },
+    "homepage": "https://github.com/robot-websockets/opencv-workings#readme"
+}
