@@ -6,11 +6,25 @@ face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 smile_cascade = cv2.CascadeClassifier('haarcascade_smile.xml')
 
-cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('http://192.168.55.6:8080/video')
+x = 1
 
+cap3 = cap.get(3)
+cap4 = cap.get(4)
+
+print('cap {} {}'.format(cap3, cap4))
+
+
+print('cap {} {}'.format(cap3, cap4))
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
+
+    if (x == 1):
+
+        # print(frame)
+        x += 1
 
     # Our operations on the frame come here
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -19,14 +33,17 @@ while(True):
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
         roi_gray = gray[y:y+h, x:x+w]
         roi_color = frame[y:y+h, x:x+w]
+        # print('\n\n new ')
+        # print(roi_gray)
         eyes = eye_cascade.detectMultiScale(roi_gray)
         for (ex, ey, ew, eh) in eyes:
             cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
         smile = smile_cascade.detectMultiScale(roi_gray)
-        for (ex, ey, ew, eh) in smile:
-            cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
+        # for (ex, ey, ew, eh) in smile:
+        #     cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
 
     # Display the resulting frame
+
     cv2.imshow('frame', frame)
     # cv2.imshow('foo', gray)
     if cv2.waitKey(1) & 0xFF == ord('q'):
