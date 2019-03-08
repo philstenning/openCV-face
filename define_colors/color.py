@@ -1,6 +1,13 @@
 import numpy as np
 import cv2
 import json
+'''
+Set the color profile for the current light setting.
+run this file then press amd hold the r,b,g or y key to change the 
+colors.
+to quit press and hold the q key
+'''
+
 cap = cv2.VideoCapture(0)
 
 img = np.zeros((1, 500, 3), np.uint8)

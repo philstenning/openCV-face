@@ -14,17 +14,16 @@ settings = {
     "contrast_high": 255,
     "contrast_low": 160,
     "contrast_auto": True,
-    "debug_mode": False,
-    "display_on_screen": True,
+    "debug_mode": True,
+    "display_on_screen": False,
     "follow_nearest_to_center": True
 
 }
 
-data = np.zeros(5, dtype=int)
+data = np.zeros(4, dtype=int)
 
 # contrast_pid = PID(1, .1, .1, setpoint=1)
-if settings['debug_mode']:
-    print(cv2.useOptimized())
+print(cv2.useOptimized())
 
 # do not remove used in the trackbar control.
 
@@ -35,54 +34,26 @@ def nothing(x):
 
 cap.set(3, settings['window_x'])
 cap.set(4, settings['window_y'])
-img_center = int(settings['window_x']/2)
 time.sleep(2)
 
 # create variables from settings needed at runtime.
 contrast_low = settings['contrast_low']
 box_2_position = settings['window_y'] - 80
 
-# the font used in the output frame window.
-font = cv2.FONT_HERSHEY_PLAIN
 
 # variables for the frame counter
 frame_counter: int = 0
 start_time = time.time()
 fps: int = 0
 
-if settings['display_on_screen']:
-    cv2.namedWindow('frame')
-    cv2.namedWindow('crop_mask_1')
-    cv2.namedWindow('crop_mask_2')
-    # change these for your screen
-    row = [50, 400, 850]
-    col = [50, 265]
-    # the positions to display the frames.
-    cv2.moveWindow('frame', row[0], col[0])
-    cv2.moveWindow('crop_mask_1', row[1], col[0])
-    cv2.moveWindow('crop_mask_2', row[1], col[1])
-    cv2.createTrackbar('LOW', 'frame', 0, 255, nothing)
-    cv2.setTrackbarPos('LOW', 'frame', contrast_low)
-
-    # create track bars for box positions
-    cv2.createTrackbar('box_2_position_trackbar', 'frame', 61,
-                       box_2_position, nothing)
-    cv2.setTrackbarPos('box_2_position_trackbar', 'frame', box_2_position)
-
 
 def set_contrast_low(new_value):
     global contrast_low
-    if settings['debug_mode']:
-        print('contrast low: {}'.format(contrast_low))
+    print('contrast low: {}'.format(contrast_low))
     contrast_low = contrast_low + int(new_value)
     # we have hit the bottom go back to top and come down again.
     if contrast_low <= 20:
         contrast_low = 255
-
-    if settings['display_on_screen']:
-        cv2.setTrackbarPos('LOW', 'frame', contrast_low)
-        if settings['debug_mode']:
-            print('box_2_position_trackbar: {}'.format(contrast_low))
 
 
 def create_crop_box(position):
@@ -206,22 +177,18 @@ def draw_rectangles(cnt, cropped_frame, center, color='red'):
     cv2.circle(cropped_frame, center, 1, (67, 95, 0), 2)
 
     # write center data to screen
-
+    img_center = 160
     res = str(-(img_center - int(x)))
     center_x, center_y = center
-    cv2.putText(cropped_frame, res, (center_x-15,  center_y+20), font,
-                1, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(cropped_frame, res, (center_x-15,  center_y+20), font,
+    #             1, (255, 255, 255), 2, cv2.LINE_AA)
     return center
 
 
 def print_fps(frame, fps):
     text = 'fps:{}'.format(fps)
-    cv2.putText(frame, text, (5, 15), font,
-                1, (255, 255, 255), 2, cv2.LINE_AA)
-
-
-def drive_bot():
-    pass
+    # cv2.putText(frame, text, (5, 15), font,
+    #             1, (255, 255, 255), 2, cv2.LINE_AA)
 
 
 # read 45 frames and throw them away
@@ -236,11 +203,6 @@ while(True):
     ret, frame = cap.read()
     frame_counter = frame_counter + 1
 
-    if settings['debug_mode']:
-        # get current positions the trackbars
-        box_2_position = cv2.getTrackbarPos('box_2_position_trackbar', 'frame')
-        contrast_low = cv2.getTrackbarPos('LOW', 'frame')
-
     # create a crop boxes to work from
     crop_mask_1, center_1, contore_count = create_crop_box(
         0)
@@ -248,7 +210,7 @@ while(True):
     # get current positions of four trackbars
     # the settings may have been updated in the previous call.
     if 1 <= contore_count <= 2:
-        low = cv2.getTrackbarPos('LOW', 'frame')
+
         crop_mask_2, center_2, contore_count_2 = create_crop_box(
             box_2_position)
         if settings['display_on_screen']:
@@ -274,25 +236,13 @@ while(True):
             data[0] = x_1
             data[1] = c_y
             data[2] = x_2
-            data[4] = int(-(img_center - int(c_y)))
-
             print(data)
         except:
-            if settings['debug_mode']:
-                print('someting bad happened')
-    else:
-        data[0] = -1
-        data[1] = -1
-        data[2] = -1
-        data[3] = -1
-        data[4] = -1
-        print(data)
-
+            print('someting bad happened')
     ##################################
 
     # drive the bot
     # TODO FROM HERE
-    drive_bot()
 
     ##################################
 
@@ -302,11 +252,9 @@ while(True):
         start_time = time.time()
         data[3] = frame_counter
         frame_counter = 0
-        # if settings['display_on_screen']:
+    print_fps(frame, fps)
 
     if settings['display_on_screen']:
-        print_fps(frame, fps)
-
         cv2.imshow('frame', frame)
         cv2.imshow('crop_mask_1', crop_mask_1)
 
