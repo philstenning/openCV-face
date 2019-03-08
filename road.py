@@ -15,9 +15,11 @@ settings = {
     "contrast_low": 160,
     "contrast_auto": True,
     "debug_mode": True,
+    "display_on_screen": False,
     "follow_nearest_to_center": True
 
 }
+data = np.zeros(4, dtype=int)
 
 # contrast_pid = PID(1, .1, .1, setpoint=1)
 print(cv2.useOptimized())
@@ -234,7 +236,8 @@ while(True):
         low = cv2.getTrackbarPos('LOW', 'frame')
         crop_mask_2, center_2, contore_count_2 = create_crop_box(
             box_2_position)
-        cv2.imshow('crop_mask_2', crop_mask_2)
+        if settings['display_on_screen']:
+            cv2.imshow('crop_mask_2', crop_mask_2)
 
     ######################
         # draw line between the two points.
@@ -253,6 +256,10 @@ while(True):
                 c_y = int(x_1 + (c_y/2))
 
             cv2.circle(frame, (c_y, c_x), 10, (0, 255, 0), 2)
+            data[0] = x_1
+            data[1] = c_y
+            data[2] = x_2
+            print(data)
         except:
             print('someting bad happened')
     ##################################
@@ -267,8 +274,9 @@ while(True):
         frame_counter = 0
     print_fps(frame, fps)
 
-    cv2.imshow('frame', frame)
-    cv2.imshow('crop_mask_1', crop_mask_1)
+    if settings['display_on_screen']:
+        cv2.imshow('frame', frame)
+        cv2.imshow('crop_mask_1', crop_mask_1)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
